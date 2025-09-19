@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZombieParty.Models.Data;
 
@@ -10,9 +11,11 @@ using ZombieParty.Models.Data;
 namespace ZombieParty.Migrations
 {
     [DbContext(typeof(ZombiePartyDbContext))]
-    partial class ZombiePartyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919172757_Ajout_Annotations_Point_ZombieType")]
+    partial class Ajout_Annotations_Point_ZombieType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

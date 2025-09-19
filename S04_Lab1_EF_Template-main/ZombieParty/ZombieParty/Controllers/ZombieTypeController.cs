@@ -1,62 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZombieParty.Models;
+using ZombieParty.Models.Data; // Vérifie si ton DbContext est bien ici
 using ZombieParty.ViewModels;
+using System.Linq;
 
 namespace ZombieParty.Controllers
 {
     public class ZombieTypeController : Controller
     {
-        private BaseDonnees _baseDonnees { get; set; }
+        private readonly ZombiePartyDbContext _baseDonnees;
 
-        public ZombieTypeController(BaseDonnees baseDonnees)
+        public ZombieTypeController(ZombiePartyDbContext baseDonnees)
         {
             _baseDonnees = baseDonnees;
         }
 
+        // GET: ZombieType
         public IActionResult Index()
         {
-            List<ZombieType> zombieTypesList = _baseDonnees.ZombieTypes.ToList();
-
+            var zombieTypesList = _baseDonnees.ZombieTypes.ToList();
             return View(zombieTypesList);
         }
 
+        // GET: ZombieType/Details
         public IActionResult Details(int id)
         {
+            var zombieType = _baseDonnees.ZombieTypes.FirstOrDefault(zt => zt.Id == id);
+            if (zombieType == null)
+            {
+                return NotFound();
+            }
+
             var zombies = _baseDonnees.Zombies.Where(z => z.ZombieTypeId == id);
 
-            ZombieTypeVM zombieTypeVM = new()
+            var zombieTypeVM = new ZombieTypeVM
             {
-                ZombieType = new(),
+                ZombieType = zombieType,
                 ZombiesList = zombies.ToList(),
                 ZombiesCount = zombies.Count(),
-                PointsAverage = zombies.Average(p => p.Point)
+                PointsAverage = zombies.Any() ? zombies.Average(p => p.Point) : 0
             };
 
-            zombieTypeVM.ZombieType = _baseDonnees.ZombieTypes.FirstOrDefault(zt => zt.Id == id);
             return View(zombieTypeVM);
         }
 
-
-        //GET CREATE
+        // GET: ZombieType/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        //POST
+        // POST: ZombieType/Create
         [HttpPost]
-        public IActionResult Create(Models.ZombieType zombieType)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(ZombieType zombieType)
         {
             if (ModelState.IsValid)
             {
-                // Ajouter à la BD
                 _baseDonnees.ZombieTypes.Add(zombieType);
+                _baseDonnees.SaveChanges(); 
                 TempData["Success"] = $"{zombieType.TypeName} zombie type added";
-                return this.RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
 
-            return this.View(zombieType);
+            return View(zombieType);
         }
-
     }
 }
