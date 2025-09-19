@@ -4,6 +4,10 @@ namespace ZombieParty.Models
 {
     public class Weapon : IValidatableObject
     {
+
+        [Key] 
+        public int Id { get; set; }
+
         [Display(Name = "Weapon's Name")]
         [StringLength(250, MinimumLength = 2)]
         public string Name { get; set; }
